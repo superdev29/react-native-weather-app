@@ -10,13 +10,21 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.weather-app"
+      "bundleIdentifier": "com.anonymous.weather-app",
+      "infoPlist": {
+        "UIBackgroundModes": ["fetch"],
+        "NSDocumentsFolderUsageDescription": "This app needs access to the documents folder to store data"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",

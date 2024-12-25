@@ -1,42 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
-import { NativeBaseProvider, extendTheme } from '@gluestack-ui/themed-native-base';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from '@/src/store';
+import { GluestackUIProvider } from "@gluestack-ui/themed";
+import { initializeStore } from '@/src/store';
+import { ActivityIndicator, View } from 'react-native';
 
-// Extend the theme to include custom colors, fonts, etc
-const theme = extendTheme({
-  colors: {
-    primary: {
-      50: '#E3F2F9',
-      100: '#C5E4F3',
-      200: '#A2D4EC',
-      300: '#7AC1E4',
-      400: '#47A9DA',
-      500: '#0088CC',
-      600: '#007AB8',
-      700: '#006BA1',
-      800: '#005885',
-      900: '#003F5E',
-    },
-  },
-  config: {
-    // Changing initialColorMode to 'dark'
-    initialColorMode: 'light',
-  },
-});
+export const Providers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [storeReady, setStoreReady] = useState<{
+    store: any;
+    persistor: any;
+  } | null>(null);
 
-interface ProvidersProps {
-  children: React.ReactNode;
-}
+  useEffect(() => {
+    initializeStore()
+      .then(result => setStoreReady(result))
+      .catch(error => console.error('Failed to initialize store:', error));
+  }, []);
 
-export const Providers: React.FC<ProvidersProps> = ({ children }) => {
+  if (!storeReady) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
-    <ReduxProvider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <NativeBaseProvider theme={theme}>
+    <ReduxProvider store={storeReady.store}>
+      <PersistGate loading={null} persistor={storeReady.persistor}>
+        <GluestackUIProvider>
           {children}
-        </NativeBaseProvider>
+        </GluestackUIProvider>
       </PersistGate>
     </ReduxProvider>
   );
